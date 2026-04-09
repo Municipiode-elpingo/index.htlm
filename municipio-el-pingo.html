@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Municipio de El Pingo</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --amarillo: #E2B95B;
+    --verde: #8FBF5A;
+    --negro: #1a1a1a;
+    --fondo: #F5F5F5;
+    --blanco: #ffffff;
+    --gris-medio: #888;
+    --grad: linear-gradient(160deg, #E2B95B 0%, #8FBF5A 100%);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--fondo);
+    color: var(--negro);
+    overflow-x: hidden;
+  }
+
+  /* ── SPLASH SCREEN ── */
+  #splash {
+    position: fixed; inset: 0;
+    background: var(--fondo);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+  }
+  #splash.hide { opacity: 0; visibility: hidden; }
+
+  .splash-logo-wrap {
+    animation: splashIn 1s cubic-bezier(.22,1,.36,1) forwards;
+    opacity: 0; transform: translateY(30px) scale(0.9);
+  }
+  @keyframes splashIn {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .splash-logo-circle {
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: var(--grad);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    box-shadow: 0 20px 60px rgba(142,191,90,0.3);
+  }
+
+  .splash-nombre {
+    margin-top: 24px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700;
+    color: var(--negro);
+    letter-spacing: 0.04em;
+    text-align: center;
+    animation: splashIn 1s 0.2s cubic-bezier(.22,1,.36,1) forwards;
+    opacity: 0;
+  }
+
+  .splash-sub {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--gris-medio);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    animation: splashIn 1s 0.4s cubic-bezier(.22,1,.36,1) forwards;
+    opacity: 0;
+  }
+
+  .splash-bar {
+    margin-top: 40px;
+    width: 60px; height: 3px;
+    border-radius: 2px;
+    background: var(--grad);
+    animation: splashBar 1.5s 0.6s ease forwards;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  @keyframes splashBar {
+    to { transform: scaleX(1); }
+  }
+
+  /* ── NAVBAR ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    z-index: 1000;
+    padding: 0 2rem;
+    height: 68px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: box-shadow 0.3s;
+  }
+  nav.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+
+  .nav-brand {
+    display: flex; align-items: center; gap: 12px;
+    text-decoration: none; color: var(--negro);
+  }
+  .nav-brand-circle {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .nav-brand-text { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; line-height: 1.2; }
+  .nav-brand-sub { font-size: 0.65rem; color: var(--gris-medio); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .nav-links { display: flex; align-items: center; gap: 0.2rem; }
+  .nav-links a {
+    text-decoration: none; color: var(--negro);
+    font-size: 0.85rem; font-weight: 500;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+  }
+  .nav-links a:hover { background: var(--fondo); }
+
+  .nav-links .has-dropdown { position: relative; }
+  .nav-links .has-dropdown > a::after { content: ' ▾'; font-size: 0.7rem; }
+  .dropdown {
+    position: absolute; top: calc(100% + 8px); left: 0;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+    padding: 8px;
+    min-width: 200px;
+    opacity: 0; visibility: hidden;
+    transform: translateY(-8px);
+    transition: all 0.2s ease;
+  }
+  .has-dropdown:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+  .dropdown a { display: block; padding: 8px 12px; border-radius: 8px; font-size: 0.82rem; }
+  .dropdown a:hover { background: var(--fondo); }
+
+  .nav-cta {
+    background: var(--grad);
+    color: white !important;
+    border-radius: 20px !important;
+    padding: 6px 16px !important;
+    font-weight: 600 !important;
+  }
+  .nav-cta:hover { opacity: 0.9; background: var(--grad) !important; }
+
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; padding: 4px; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--negro); border-radius: 2px; transition: all 0.3s; }
+
+  /* ── HERO ── */
+  #inicio {
+    min-height: 100vh;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+    padding: 100px 2rem 60px;
+  }
+
+  .hero-bg-circles {
+    position: absolute; inset: 0; pointer-events: none;
+  }
+  .hero-bg-circles::before {
+    content: '';
+    position: absolute; right: -120px; top: -80px;
+    width: 500px; height: 500px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .hero-bg-circles::after {
+    content: '';
+    position: absolute; left: -80px; bottom: -120px;
+    width: 400px; height: 400px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+
+  .hero-inner {
+    max-width: 900px; width: 100%;
+    text-align: center; position: relative; z-index: 1;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(255,255,255,0.25);
+    backdrop-filter: blur(8px);
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--negro);
+    margin-bottom: 28px;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 7vw, 5.5rem);
+    font-weight: 700;
+    color: var(--negro);
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .hero-title span { color: white; }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: rgba(0,0,0,0.65);
+    max-width: 520px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+  }
+
+  .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-primary {
+    background: var(--negro);
+    color: white;
+    padding: 14px 28px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); }
+
+  .btn-outline {
+    background: rgba(255,255,255,0.3);
+    color: var(--negro);
+    padding: 14px 28px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1.5px solid rgba(0,0,0,0.15);
+    transition: background 0.2s;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.5); }
+
+  .hero-stats {
+    margin-top: 60px;
+    display: flex; gap: 40px; justify-content: center; flex-wrap: wrap;
+  }
+  .hero-stat { text-align: center; }
+  .hero-stat strong { display: block; font-size: 1.8rem; font-weight: 700; color: var(--negro); font-family: 'Playfair Display', serif; }
+  .hero-stat span { font-size: 0.78rem; color: rgba(0,0,0,0.55); text-transform: uppercase; letter-spacing: 0.1em; }
+
+  /* ── SECTIONS ── */
+  section { padding: 90px 2rem; }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  .section-label {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--verde);
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    color: var(--negro);
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    font-size: 1rem;
+    color: var(--gris-medio);
+    max-width: 560px;
+    line-height: 1.75;
+    margin-bottom: 48px;
+  }
+
+  /* ── MUNICIPIO ── */
+  #municipio { background: white; }
+
+  .municipio-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .municipio-visual {
+    border-radius: 24px;
+    background: var(--grad);
+    height: 420px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .municipio-visual::before {
+    content: '';
+    position: absolute; bottom: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+  }
+
+  .info-cards { display: flex; flex-direction: column; gap: 16px; margin-top: 32px; }
+  .info-card {
+    background: var(--fondo);
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex; align-items: flex-start; gap: 16px;
+    transition: transform 0.2s;
+  }
+  .info-card:hover { transform: translateX(4px); }
+  .info-card-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; flex-shrink: 0;
+  }
+  .info-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 2px; }
+  .info-card p { font-size: 0.82rem; color: var(--gris-medio); }
+
+  /* ── CONCEJO ── */
+  #concejo { background: var(--fondo); }
+
+  .concejo-tabs {
+    display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 1.5px solid rgba(0,0,0,0.1);
+    background: white;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab-btn.active {
+    background: var(--grad);
+    border-color: transparent;
+    color: white;
+    font-weight: 600;
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Ordenanzas */
+  .ordenanzas-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .ordenanza-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex; align-items: flex-start; gap: 14px;
+    border: 1.5px solid rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s, transform 0.2s;
+    text-decoration: none; color: inherit;
+  }
+  .ordenanza-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); transform: translateY(-2px); }
+  .pdf-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: #fff0f0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem; flex-shrink: 0;
+  }
+  .ordenanza-card h4 { font-size: 0.88rem; font-weight: 600; margin-bottom: 3px; }
+  .ordenanza-card p { font-size: 0.78rem; color: var(--gris-medio); }
+  .ordenanza-dl {
+    margin-top: 8px;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.75rem;
+    color: var(--verde);
+    font-weight: 600;
+  }
+
+  /* Actas */
+  .actas-list { display: flex; flex-direction: column; gap: 12px; }
+  .acta-item {
+    background: white;
+    border-radius: 14px;
+    padding: 18px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    border: 1.5px solid rgba(0,0,0,0.06);
+    transition: box-shadow 0.2s;
+  }
+  .acta-item:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+  .acta-info h4 { font-size: 0.88rem; font-weight: 600; }
+  .acta-info p { font-size: 0.78rem; color: var(--gris-medio); margin-top: 2px; }
+  .acta-badge {
+    padding: 4px 12px;
+    border-radius: 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    background: #e8f5e1;
+    color: #5a8a2a;
+  }
+
+  /* ── TRÁMITES ── */
+  #tramites { background: white; }
+
+  .tramites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+  .tramite-card {
+    background: var(--fondo);
+    border-radius: 20px;
+    padding: 28px 22px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    text-decoration: none; color: inherit;
+  }
+  .tramite-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.08); border-color: var(--amarillo); }
+  .tramite-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem;
+    margin: 0 auto 16px;
+  }
+  .tramite-card h4 { font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; }
+  .tramite-card p { font-size: 0.78rem; color: var(--gris-medio); line-height: 1.5; }
+
+  /* ── NOTICIAS ── */
+  #noticias { background: var(--fondo); }
+
+  .noticias-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+  .noticia-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1.5px solid rgba(0,0,0,0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .noticia-card:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,0.09); }
+  .noticia-img {
+    height: 160px;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem;
+    position: relative;
+  }
+  .noticia-img .noticia-cat {
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(255,255,255,0.85);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--negro);
+  }
+  .noticia-body { padding: 20px; }
+  .noticia-fecha { font-size: 0.72rem; color: var(--gris-medio); margin-bottom: 8px; letter-spacing: 0.05em; }
+  .noticia-title { font-size: 0.95rem; font-weight: 600; line-height: 1.4; margin-bottom: 8px; }
+  .noticia-desc { font-size: 0.8rem; color: var(--gris-medio); line-height: 1.6; }
+  .noticia-link {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-top: 12px;
+    font-size: 0.78rem;
+    color: var(--verde);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* ── CONTACTO ── */
+  #contacto { background: white; }
+
+  .contacto-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: start;
+  }
+
+  .contacto-info { display: flex; flex-direction: column; gap: 16px; }
+  .contacto-item {
+    display: flex; align-items: flex-start; gap: 14px;
+    padding: 18px;
+    background: var(--fondo);
+    border-radius: 14px;
+  }
+  .contacto-item-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: var(--grad);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .contacto-item h4 { font-size: 0.82rem; font-weight: 600; color: var(--gris-medio); text-transform: uppercase; letter-spacing: 0.06em; }
+  .contacto-item p { font-size: 0.9rem; font-weight: 500; margin-top: 2px; }
+
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; }
+  .form-group input, .form-group textarea, .form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(0,0,0,0.1);
+    background: var(--fondo);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--negro);
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: var(--amarillo);
+    background: white;
+  }
+  .form-group textarea { height: 120px; resize: vertical; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 14px;
+    border-radius: 30px;
+    border: none;
+    background: var(--grad);
+    color: white;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--negro);
+    color: white;
+    padding: 60px 2rem 30px;
+  }
+  .footer-inner { max-width: 1100px; margin: 0 auto; }
+  .footer-top {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 48px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .footer-brand h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    margin-bottom: 12px;
+  }
+  .footer-brand p {
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.7;
+    max-width: 260px;
+  }
+  .footer-brand .footer-grad-bar {
+    width: 40px; height: 3px;
+    border-radius: 2px;
+    background: var(--grad);
+    margin-top: 16px;
+  }
+  .footer-col h4 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 16px;
+  }
+  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .footer-col ul li a {
+    text-decoration: none;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  .footer-col ul li a:hover { color: var(--amarillo); }
+
+  .footer-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 24px;
+    flex-wrap: wrap; gap: 12px;
+  }
+  .footer-bottom p { font-size: 0.78rem; color: rgba(255,255,255,0.35); }
+
+  /* ── MOBILE NAV ── */
+  .mobile-menu {
+    display: none;
+    position: fixed; top: 68px; left: 0; right: 0;
+    background: white;
+    padding: 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    z-index: 999;
+    flex-direction: column; gap: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    padding: 10px 16px;
+    text-decoration: none;
+    color: var(--negro);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+  .mobile-menu a:hover { background: var(--fondo); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .municipio-grid, .contacto-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+    section { padding: 64px 1.2rem; }
+    nav { padding: 0 1.2rem; }
+    .hero-stats { gap: 24px; }
+  }
+
+  /* ── SCROLL REVEAL ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo-wrap">
+    <div class="splash-logo-circle">
+      <!-- Logo SVG tren -->
+      <svg width="100" height="100" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Chimenea -->
+        <rect x="52" y="22" width="16" height="22" rx="4" fill="#1a1a1a"/>
+        <rect x="48" y="18" width="24" height="10" rx="5" fill="#1a1a1a"/>
+        <!-- Cuerpo frontal -->
+        <rect x="30" y="44" width="60" height="32" rx="4" fill="#1a1a1a"/>
+        <!-- Faro circular externo 1 -->
+        <circle cx="60" cy="60" r="18" fill="#1a1a1a"/>
+        <circle cx="60" cy="60" r="14" fill="white"/>
+        <circle cx="60" cy="60" r="10" fill="#1a1a1a"/>
+        <circle cx="60" cy="60" r="6" fill="white"/>
+        <!-- Parrilla delantera -->
+        <path d="M20 76 Q60 100 100 76" stroke="#1a1a1a" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <line x1="36" y1="76" x2="30" y2="94" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="46" y1="76" x2="42" y2="96" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="56" y1="76" x2="54" y2="98" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="64" y1="76" x2="66" y2="98" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="74" y1="76" x2="78" y2="96" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+        <line x1="84" y1="76" x2="90" y2="94" stroke="#1a1a1a" stroke-width="4" stroke-linecap="round"/>
+        <!-- Curva inferior -->
+        <path d="M16 92 Q60 112 104 92" stroke="#1a1a1a" stroke-width="5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+  <p class="splash-nombre">Municipio de El Pingo</p>
+  <p class="splash-sub">Provincia de Buenos Aires · Argentina</p>
+  <div class="splash-bar"></div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="#inicio" class="nav-brand">
+    <div class="nav-brand-circle">
+      <svg width="22" height="22" viewBox="0 0 120 120" fill="none">
+        <rect x="52" y="22" width="16" height="22" rx="4" fill="white"/>
+        <rect x="48" y="18" width="24" height="10" rx="5" fill="white"/>
+        <rect x="30" y="44" width="60" height="32" rx="4" fill="white"/>
+        <circle cx="60" cy="60" r="18" fill="white"/>
+        <circle cx="60" cy="60" r="10" fill="#8FBF5A"/>
+        <circle cx="60" cy="60" r="5" fill="white"/>
+        <path d="M20 76 Q60 100 100 76" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <path d="M16 92 Q60 112 104 92" stroke="white" stroke-width="5" fill="none" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div>
+      <div class="nav-brand-text">El Pingo</div>
+      <div class="nav-brand-sub">Municipio</div>
+    </div>
+  </a>
+
+  <div class="nav-links">
+    <a href="#inicio">Inicio</a>
+    <a href="#municipio">El Municipio</a>
+    <div class="has-dropdown">
+      <a href="#concejo">H.C. Deliberante</a>
+      <div class="dropdown">
+        <a href="#concejo" onclick="setTab('ordenanzas')">📄 Ordenanzas</a>
+        <a href="#concejo" onclick="setTab('actas')">📋 Actas y Resoluciones</a>
+      </div>
+    </div>
+    <a href="#tramites">Trámites</a>
+    <a href="#noticias">Noticias</a>
+    <a href="#contacto" class="nav-cta">Contacto</a>
+  </div>
+
+  <div class="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- MOBILE MENU -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#inicio" onclick="closeMenu()">Inicio</a>
+  <a href="#municipio" onclick="closeMenu()">El Municipio</a>
+  <a href="#concejo" onclick="closeMenu(); setTab('ordenanzas')">Ordenanzas</a>
+  <a href="#concejo" onclick="closeMenu(); setTab('actas')">Actas y Resoluciones</a>
+  <a href="#tramites" onclick="closeMenu()">Trámites y Servicios</a>
+  <a href="#noticias" onclick="closeMenu()">Noticias</a>
+  <a href="#contacto" onclick="closeMenu()">Contacto</a>
+</div>
+
+<!-- HERO -->
+<section id="inicio">
+  <div class="hero-bg-circles"></div>
+  <div class="hero-inner">
+    <div class="hero-badge">🚂 Bienvenidos</div>
+    <h1 class="hero-title">Municipio de<br><span>El Pingo</span></h1>
+    <p class="hero-desc">Una comunidad unida, comprometida con el progreso, la transparencia y el bienestar de todos sus vecinos.</p>
+    <div class="hero-btns">
+      <a href="#tramites" class="btn-primary">Ver Trámites →</a>
+      <a href="#municipio" class="btn-outline">Conocer más</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><strong>2.400+</strong><span>Habitantes</span></div>
+      <div class="hero-stat"><strong>1947</strong><span>Fundación</span></div>
+      <div class="hero-stat"><strong>48 km²</strong><span>Extensión</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- EL MUNICIPIO -->
+<section id="municipio">
+  <div class="container">
+    <div class="municipio-grid reveal">
+      <div>
+        <span class="section-label">El Municipio</span>
+        <h2 class="section-title">Historia y<br>comunidad</h2>
+        <p class="section-desc">El Pingo es una localidad de la provincia de Buenos Aires, Argentina, conocida por su historia ferroviaria y su fuerte espíritu comunitario. Nuestro municipio trabaja día a día para brindar los mejores servicios a sus vecinos.</p>
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="info-card-icon">🏛️</div>
+            <div>
+              <h4>Intendencia Municipal</h4>
+              <p>Conducción ejecutiva comprometida con la gestión pública transparente.</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">🌾</div>
+            <div>
+              <h4>Actividad Productiva</h4>
+              <p>Zona agroproductiva con fuerte arraigo agropecuario y ganadero.</p>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-icon">🚂</div>
+            <div>
+              <h4>Patrimonio Ferroviario</h4>
+              <p>Nuestra identidad está marcada por el histórico paso del ferrocarril.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="municipio-visual">
+        <svg width="160" height="160" viewBox="0 0 120 120" fill="none">
+          <rect x="52" y="22" width="16" height="22" rx="4" fill="rgba(0,0,0,0.7)"/>
+          <rect x="48" y="18" width="24" height="10" rx="5" fill="rgba(0,0,0,0.7)"/>
+          <rect x="30" y="44" width="60" height="32" rx="4" fill="rgba(0,0,0,0.7)"/>
+          <circle cx="60" cy="60" r="18" fill="rgba(0,0,0,0.7)"/>
+          <circle cx="60" cy="60" r="14" fill="rgba(255,255,255,0.5)"/>
+          <circle cx="60" cy="60" r="10" fill="rgba(0,0,0,0.7)"/>
+          <circle cx="60" cy="60" r="6" fill="rgba(255,255,255,0.5)"/>
+          <path d="M20 76 Q60 100 100 76" stroke="rgba(0,0,0,0.7)" stroke-width="5" fill="none" stroke-linecap="round"/>
+          <line x1="36" y1="76" x2="30" y2="94" stroke="rgba(0,0,0,0.7)" stroke-width="4" stroke-linecap="round"/>
+          <line x1="46" y1="76" x2="42" y2="96" stroke="rgba(0,0,0,0.7)" stroke-width="4" stroke-linecap="round"/>
+          <line x1="56" y1="76" x2="54" y2="98" stroke="rgba(0,0,0,0.7)" stroke-width="4" stroke-linecap="round"/>
+          <line x1="64" y1="76" x2="66" y2="98" stroke="rgba(0,0,0,0.7)" stroke-width="4" stroke-linecap="round"/>
+          <line x1="74" y1="76" x2="78" y2="96" stroke="rgba(0,0,0,0.7)" stroke-width="4" stroke-linecap="round"/>
+          <line x1="84" y1="76" x2="90" y2="94" stroke="rgba(0,0,0,0.7)" stroke-width="4" stroke-linecap="round"/>
+          <path d="M16 92 Q60 112 104 92" stroke="rgba(0,0,0,0.7)" stroke-width="5" fill="none" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEJO DELIBERANTE -->
+<section id="concejo">
+  <div class="container">
+    <span class="section-label">Poder Legislativo Local</span>
+    <h2 class="section-title">Honorable Concejo<br>Deliberante</h2>
+    <p class="section-desc">Órgano legislativo del municipio responsable de sancionar ordenanzas, resoluciones y declaraciones que rigen la vida local.</p>
+
+    <div class="concejo-tabs">
+      <button class="tab-btn active" onclick="setTab('ordenanzas')">📄 Ordenanzas</button>
+      <button class="tab-btn" onclick="setTab('actas')">📋 Actas y Resoluciones</button>
+    </div>
+
+    <!-- Ordenanzas -->
+    <div class="tab-content active" id="tab-ordenanzas">
+      <div class="ordenanzas-grid reveal">
+        <a href="#" class="ordenanza-card">
+          <div class="pdf-icon">📄</div>
+          <div>
+            <h4>Ordenanza Nº 001/2024</h4>
+            <p>Presupuesto municipal ejercicio 2024</p>
+            <span class="ordenanza-dl">⬇ Descargar PDF</span>
+          </div>
+        </a>
+        <a href="#" class="ordenanza-card">
+          <div class="pdf-icon">📄</div>
+          <div>
+            <h4>Ordenanza Nº 002/2024</h4>
+            <p>Reglamento de tránsito y vías públicas</p>
+            <span class="ordenanza-dl">⬇ Descargar PDF</span>
+          </div>
+        </a>
+        <a href="#" class="ordenanza-card">
+          <div class="pdf-icon">📄</div>
+          <div>
+            <h4>Ordenanza Nº 003/2024</h4>
+            <p>Plan de ordenamiento urbano y territorial</p>
+            <span class="ordenanza-dl">⬇ Descargar PDF</span>
+          </div>
+        </a>
+        <a href="#" class="ordenanza-card">
+          <div class="pdf-icon">📄</div>
+          <div>
+            <h4>Ordenanza Nº 004/2024</h4>
+            <p>Habilitaciones comerciales y tasas municipales</p>
+            <span class="ordenanza-dl">⬇ Descargar PDF</span>
+          </div>
+        </a>
+        <a href="#" class="ordenanza-card">
+          <div class="pdf-icon">📄</div>
+          <div>
+            <h4>Ordenanza Nº 005/2024</h4>
+            <p>Protección ambiental y manejo de residuos</p>
+            <span class="ordenanza-dl">⬇ Descargar PDF</span>
+          </div>
+        </a>
+        <a href="#" class="ordenanza-card">
+          <div class="pdf-icon">📄</div>
+          <div>
+            <h4>Ordenanza Nº 006/2023</h4>
+            <p>Código de convivencia ciudadana</p>
+            <span class="ordenanza-dl">⬇ Descargar PDF</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Actas -->
+    <div class="tab-content" id="tab-actas">
+      <div class="actas-list reveal">
+        <div class="acta-item">
+          <div class="acta-info">
+            <h4>Acta Nº 08/2024 — Sesión Ordinaria</h4>
+            <p>12 de agosto de 2024 · Aprobación de obras de pavimentación</p>
+          </div>
+          <span class="acta-badge">Aprobada</span>
+        </div>
+        <div class="acta-item">
+          <div class="acta-info">
+            <h4>Resolución Nº 15/2024</h4>
+            <p>5 de julio de 2024 · Adhesión al programa provincial de vivienda</p>
+          </div>
+          <span class="acta-badge">Vigente</span>
+        </div>
+        <div class="acta-item">
+          <div class="acta-info">
+            <h4>Acta Nº 07/2024 — Sesión Extraordinaria</h4>
+            <p>28 de junio de 2024 · Modificación presupuestaria</p>
+          </div>
+          <span class="acta-badge">Aprobada</span>
+        </div>
+        <div class="acta-item">
+          <div class="acta-info">
+            <h4>Resolución Nº 12/2024</h4>
+            <p>14 de mayo de 2024 · Creación del registro de proveedores local</p>
+          </div>
+          <span class="acta-badge">Vigente</span>
+        </div>
+        <div class="acta-item">
+          <div class="acta-info">
+            <h4>Acta Nº 06/2024 — Sesión Ordinaria</h4>
+            <p>10 de abril de 2024 · Informe de gestión primer trimestre</p>
+          </div>
+          <span class="acta-badge">Aprobada</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRÁMITES -->
+<section id="tramites">
+  <div class="container">
+    <span class="section-label">Atención al Vecino</span>
+    <h2 class="section-title">Trámites<br>y Servicios</h2>
+    <p class="section-desc">Accedé a los servicios municipales de manera rápida y sencilla. Estamos para facilitarte los trámites del día a día.</p>
+    <div class="tramites-grid reveal">
+      <a href="#" class="tramite-card">
+        <div class="tramite-icon">🏠</div>
+        <h4>Habilitación Comercial</h4>
+        <p>Registro y renovación de habilitaciones para establecimientos comerciales.</p>
+      </a>
+      <a href="#" class="tramite-card">
+        <div class="tramite-icon">💧</div>
+        <h4>Servicios de Agua</h4>
+        <p>Solicitudes, reclamos y trámites relacionados al servicio de agua potable.</p>
+      </a>
+      <a href="#" class="tramite-card">
+        <div class="tramite-icon">🗑️</div>
+        <h4>Residuos y Limpieza</h4>
+        <p>Recolección de residuos, puntos limpios y calendario de recolección.</p>
+      </a>
+      <a href="#" class="tramite-card">
+        <div class="tramite-icon">🏗️</div>
+        <h4>Permisos de Obra</h4>
+        <p>Solicitud de permisos para construcciones, ampliaciones y refacciones.</p>
+      </a>
+      <a href="#" class="tramite-card">
+        <div class="tramite-icon">🐕</div>
+        <h4>Registro de Mascotas</h4>
+        <p>Registro y vacunación de mascotas. Zoonosis municipal.</p>
+      </a>
+      <a href="#" class="tramite-card">
+        <div class="tramite-icon">📋</div>
+        <h4>Certificados</h4>
+        <p>Libre deuda, certificados de domicilio y otros documentos municipales.</p>
+      </a>
+      <a href="#" class="tramite-card">
+        <div class="tramite-icon">💡</div>
+        <h4>Alumbrado Público</h4>
+        <p>Reclamos por luminarias, solicitudes de nuevos puntos de luz.</p>
+      </a>
+      <a href="#" class="tramite-card">
+        <div class="tramite-icon">🌳</div>
+        <h4>Espacios Verdes</h4>
+        <p>Poda de árboles, mantenimiento de plazas y espacios recreativos.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- NOTICIAS -->
+<section id="noticias">
+  <div class="container">
+    <span class="section-label">Actualidad</span>
+    <h2 class="section-title">Últimas<br>Noticias</h2>
+    <p class="section-desc">Mantenete informado sobre las novedades, obras y eventos de tu municipio.</p>
+    <div class="noticias-grid reveal">
+      <div class="noticia-card">
+        <div class="noticia-img">🏗️<span class="noticia-cat">Obras</span></div>
+        <div class="noticia-body">
+          <p class="noticia-fecha">8 de abril de 2026</p>
+          <h3 class="noticia-title">Comenzaron las obras de pavimentación en Av. San Martín</h3>
+          <p class="noticia-desc">El municipio dio inicio a las obras de pavimentación en la avenida principal con una inversión de más de $15 millones.</p>
+          <a href="#" class="noticia-link">Leer más →</a>
+        </div>
+      </div>
+      <div class="noticia-card">
+        <div class="noticia-img">🎉<span class="noticia-cat">Eventos</span></div>
+        <div class="noticia-body">
+          <p class="noticia-fecha">3 de abril de 2026</p>
+          <h3 class="noticia-title">Gran Fiesta del Pueblo: 79° Aniversario de El Pingo</h3>
+          <p class="noticia-desc">Este año celebramos un nuevo aniversario con shows en vivo, feria de artesanos y fuegos artificiales en la plaza central.</p>
+          <a href="#" class="noticia-link">Leer más →</a>
+        </div>
+      </div>
+      <div class="noticia-card">
+        <div class="noticia-img">📚<span class="noticia-cat">Social</span></div>
+        <div class="noticia-body">
+          <p class="noticia-fecha">28 de marzo de 2026</p>
+          <h3 class="noticia-title">Nuevos cursos gratuitos en el Centro Cultural Municipal</h3>
+          <p class="noticia-desc">El municipio abre la inscripción a talleres de computación, cocina, costura y apoyo escolar para todos los vecinos.</p>
+          <a href="#" class="noticia-link">Leer más →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto">
+  <div class="container">
+    <span class="section-label">Contacto</span>
+    <h2 class="section-title">Comunicate<br>con nosotros</h2>
+    <div class="contacto-grid reveal">
+      <div>
+        <p class="section-desc">Estamos a tu disposición para consultas, reclamos o sugerencias. Podés visitarnos en la sede municipal o escribirnos.</p>
+        <div class="contacto-info">
+          <div class="contacto-item">
+            <div class="contacto-item-icon">📍</div>
+            <div>
+              <h4>Dirección</h4>
+              <p>Av. San Martín 250, El Pingo<br>Buenos Aires, Argentina</p>
+            </div>
+          </div>
+          <div class="contacto-item">
+            <div class="contacto-item-icon">📞</div>
+            <div>
+              <h4>Teléfono</h4>
+              <p>(02291) 40-1234</p>
+            </div>
+          </div>
+          <div class="contacto-item">
+            <div class="contacto-item-icon">✉️</div>
+            <div>
+              <h4>Correo Electrónico</h4>
+              <p>municipio@elpingo.gob.ar</p>
+            </div>
+          </div>
+          <div class="contacto-item">
+            <div class="contacto-item-icon">🕐</div>
+            <div>
+              <h4>Horario de Atención</h4>
+              <p>Lunes a Viernes: 8:00 – 14:00 hs</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" placeholder="Ej: Juan Pérez">
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" placeholder="tu@email.com">
+        </div>
+        <div class="form-group">
+          <label>Asunto</label>
+          <select>
+            <option>Consulta general</option>
+            <option>Reclamo</option>
+            <option>Sugerencia</option>
+            <option>Trámite</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mensaje</label>
+          <textarea placeholder="Escribí tu consulta o reclamo aquí..."></textarea>
+        </div>
+        <button class="btn-submit">Enviar Mensaje →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <h3>Municipio de El Pingo</h3>
+        <p>Comprometidos con el desarrollo, la transparencia y el bienestar de cada vecino de nuestra comunidad.</p>
+        <div class="footer-grad-bar"></div>
+      </div>
+      <div class="footer-col">
+        <h4>Institucional</h4>
+        <ul>
+          <li><a href="#municipio">El Municipio</a></li>
+          <li><a href="#concejo">Concejo Deliberante</a></li>
+          <li><a href="#concejo" onclick="setTab('ordenanzas')">Ordenanzas</a></li>
+          <li><a href="#concejo" onclick="setTab('actas')">Actas</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Servicios</h4>
+        <ul>
+          <li><a href="#tramites">Trámites</a></li>
+          <li><a href="#noticias">Noticias</a></li>
+          <li><a href="#contacto">Contacto</a></li>
+          <li><a href="#">Acceso a la Información</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Municipio de El Pingo · Provincia de Buenos Aires, Argentina</p>
+      <p style="color:rgba(255,255,255,0.2);">Diseño Web Institucional</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Splash
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('splash').classList.add('hide');
+    }, 2200);
+  });
+
+  // Navbar scroll
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  // Mobile menu
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+  function closeMenu() {
+    document.getElementById('mobileMenu').classList.remove('open');
+  }
+
+  // Tabs
+  function setTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    const btns = document.querySelectorAll('.tab-btn');
+    if (tab === 'ordenanzas') btns[0].classList.add('active');
+    else btns[1].classList.add('active');
+  }
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Form submit
+  document.querySelector('.btn-submit').addEventListener('click', function() {
+    this.textContent = '✓ Mensaje enviado';
+    this.style.background = 'linear-gradient(160deg, #8FBF5A, #5a9a2a)';
+    setTimeout(() => {
+      this.textContent = 'Enviar Mensaje →';
+      this.style.background = '';
+    }, 3000);
+  });
+</script>
+</body>
+</html>
